@@ -5,6 +5,8 @@ import (
 	"root/db"
 	r "root/routes/user"
 
+	h "root/helper"
+
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
@@ -15,9 +17,11 @@ func main() {
 
 	store.CheckStoreConnection()
 
+	defer store.Close()
+
 	app := router.New()
 
 	r.User(store, app)
 
-	fasthttp.ListenAndServe(":5000", app.Handler)
+	fasthttp.ListenAndServe(h.Port(), app.Handler)
 }
