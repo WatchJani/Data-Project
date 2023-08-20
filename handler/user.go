@@ -1,11 +1,21 @@
 package handler
 
-import "github.com/jmoiron/sqlx"
+import (
+	"root/db"
+
+	"github.com/valyala/fasthttp"
+)
 
 type UserDB struct {
-	db *sqlx.DB
+	db *db.Store
 }
 
-func (db *UserDB) GetAll() {
+func New(db *db.Store) *UserDB {
+	return &UserDB{
+		db: db,
+	}
+}
+
+func (db *UserDB) GetAll(ctx *fasthttp.RequestCtx) {
 
 }
