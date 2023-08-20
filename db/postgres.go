@@ -9,7 +9,7 @@ import (
 )
 
 type Store struct {
-	db *sqlx.DB
+	*sqlx.DB
 }
 
 type Configuration struct {
@@ -44,7 +44,7 @@ func CustomPostgresConfiguration(Host, Port, User, Password, Name string) *Confi
 }
 
 func NewStore(db *sqlx.DB) *Store {
-	return &Store{db: db}
+	return &Store{db}
 }
 
 func Open(config *Configuration) (*Store, error) {
@@ -61,9 +61,9 @@ func Open(config *Configuration) (*Store, error) {
 }
 
 func (store *Store) CheckStoreConnection() error {
-	return store.db.Ping()
+	return store.Ping()
 }
 
 func (store *Store) Close() error {
-	return store.db.Close()
+	return store.Close()
 }

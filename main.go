@@ -7,6 +7,8 @@ import (
 
 	h "root/helper"
 
+	_ "root/sql"
+
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
