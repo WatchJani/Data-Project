@@ -24,46 +24,46 @@ func chainingMiddleware(h fasthttp.RequestHandler, m ...Middleware) fasthttp.Req
 	return wrappedHandler
 }
 
-func CORSMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin := r.Header.Get("Origin")
-		w.Header().Set("Access-Control-Allow-Origin", origin)
-		if r.Method == "OPTIONS" {
-			w.Header().Set("Access-Control-Allow-Credentials", "true")
-			w.Header().Set("Access-Control-Allow-Methods", "GET,POST")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-CSRF-Token, Authorization")
+func CORSMiddleware(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+	return func(ctx *fasthttp.RequestCtx) {
+		origin := string(ctx.Request.Header.Peek("Origin"))
+		ctx.Response.Header.Set("Access-Control-Allow-Origin", origin)
+		if string(ctx.Method()) == "OPTIONS" {
+			ctx.Response.Header.Set("Access-Control-Allow-Credentials", "true")
+			ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET,POST")
+			ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type, X-CSRF-Token, Authorization")
 			return
 		} else {
-			next.ServeHTTP(w, r)
+			next(ctx)
 		}
-	})
+	}
 }
 
-func panicRecovery(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
+func panicRecovery(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+	return func(ctx *fasthttp.RequestCtx) {
 		defer func() {
 			if err := recover(); err != nil {
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				ctx.Error(fmt.Sprintf(http.StatusText(http.StatusInternalServerError)), http.StatusInternalServerError)
 				log.Println(string(debug.Stack()))
 			}
 		}()
-		next(w, req)
+		next(ctx)
 	}
 }
 
-func headerMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
-		next(w, r)
+func headerMiddleware(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+	return func(ctx *fasthttp.RequestCtx) {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		next(ctx)
 	}
 }
 
-func loggingMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func loggingMiddleware(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+	return func(ctx *fasthttp.RequestCtx) {
 		fmt.Println("Before handler is executed")
-		w.Write([]byte("Adding response via middleware\n"))
-		log.Println(r.URL.Path)
-		next.ServeHTTP(w, r)
+		ctx.WriteString("Adding response via middleware\n")
+		log.Println(string(ctx.Request.URI().Path()))
+		next(ctx)
 		fmt.Println("After handler is executed")
-	})
+	}
 }
