@@ -16,4 +16,5 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.16.3 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	golang.org/x/crypto v0.12.0
 )

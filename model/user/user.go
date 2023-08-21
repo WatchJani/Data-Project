@@ -5,6 +5,7 @@ import (
 	"time"
 
 	e "root/check_error"
+	"root/helper"
 
 	"github.com/jmoiron/sqlx"
 
@@ -37,4 +38,13 @@ func GetUser(db *sqlx.DB, userID string) ([]byte, error) {
 	e.ErrorHandler(db.Get(&user, sql.GetUser(), userID))
 
 	return json.Marshal(user)
+}
+
+func NewUser(db *sqlx.DB, Name, LastName, Password, Phone, Mail, UserName string, BornDate time.Time) {
+	newPassword, err := helper.HashPassword(Password)
+	e.ErrorHandler(err)
+
+	_, err = db.Exec(sql.NewUser(), Name, LastName, newPassword, Phone, Mail, UserName, BornDate)
+	e.ErrorHandler(err)
+
 }

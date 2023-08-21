@@ -14,7 +14,7 @@ func User(db *db.Store, app *router.Router) {
 	app.GET("/user", user.GetAll)
 	app.GET("/user/{id}", user.GetUser)
 
-	// app.POST("/user/create", user.GetAll)
+	app.POST("/user", user.NewUser)
 	// app.POST("/user/{code}", user.GetAll)
 
 }
