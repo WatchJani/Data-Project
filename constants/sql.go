@@ -1,5 +1,5 @@
 package constants
 
 const (
-	FILE_SQL_NAME string = "."
+	FILE_SQL_NAME string = "./sql"
 )

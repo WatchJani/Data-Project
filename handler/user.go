@@ -2,7 +2,7 @@ package handler
 
 import (
 	"root/db"
-	"root/model"
+	model "root/model/user"
 
 	e "root/check_error"
 
@@ -20,7 +20,12 @@ func New(db *db.Store) *UserDB {
 }
 
 func (db *UserDB) GetAll(ctx *fasthttp.RequestCtx) {
+	user, err := model.GetAll(db.DB)
 
+	e.ErrorHandler(err)
+
+	ctx.SetContentType("application/json")
+	ctx.SetBody(user)
 }
 
 func (db *UserDB) GetUser(ctx *fasthttp.RequestCtx) {
